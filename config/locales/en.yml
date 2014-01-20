@@ -1,3 +1,4 @@
 # English strings go here for Rails i18n
 en:
-  # my_label: "My label"
+  field_starting_hours: Starts at (ical)
+  field_finishing_hours: Ends at (ical)

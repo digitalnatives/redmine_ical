@@ -1,0 +1,4 @@
+# English strings go here for Rails i18n
+en:
+  field_starting_hours: Kezdődik (ical)
+  field_finishing_hours: Véget ér (ical)

@@ -1,3 +1,15 @@
+Rails.configuration.to_prepare do
+  require_dependency 'ical_view_hook_listener'
+
+  Issue.class_eval do
+    safe_attributes 'starting_hours', 'finishing_hours'
+
+    serialize :starting_hours, Tod::TimeOfDay
+    serialize :finishing_hours, Tod::TimeOfDay
+  end
+
+end
+
 Redmine::Plugin.register :redmine_ical do
   name 'Redmine Ical plugin'
   author 'Digital Natives'
