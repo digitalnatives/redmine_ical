@@ -6,6 +6,26 @@ Rails.configuration.to_prepare do
 
     serialize :starting_hours, Tod::TimeOfDay
     serialize :finishing_hours, Tod::TimeOfDay
+
+    validates :starting_hours, :finishing_hours,
+              presence: true, if: :cal_hours_should_be_validated?
+
+    def ical_start_date
+      start_day = start_date || Date.today
+      start_day.at starting_hours
+    end
+
+    def ical_end_date
+      finish_day = due_date || start_date || Date.today
+      finish_day.at finishing_hours
+    end
+
+    private
+
+    def cal_hours_should_be_validated?
+      true
+    end
+
   end
 
 end
