@@ -1,10 +1,10 @@
 function syncDateInput(dateInput, dateTimeInput) {
   dateInput.val(dateTimeInput.val().split(' ')[0]);
-  dateTimeInput.val(dateTimeInput.val().split(' ')[1]);
+  dateTimeInput.val(dateTimeInput.val().split(' ').pop());
 }
 
 function syncDateTimeInput(dateInputSelector, $dateTimeInput){
-  $dateTimeInput.val($(dateInputSelector).val() + ' ' + $dateTimeInput.val());
+  $dateTimeInput.val($(dateInputSelector).val() + ' ' + $dateTimeInput.val().split(' ').pop());
 }
 
 $(function() {
