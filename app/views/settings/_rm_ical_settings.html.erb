@@ -1,0 +1,14 @@
+<table>
+  <tbody>
+    <tr>
+      <th><%= l('redmine_ical.trackers') %>:</th>
+      <% Tracker.all.each do |tracker| %>
+        <tr>
+          <th> <%= tracker %> </th>
+          <td> <%= check_box_tag "settings[trackers][#{tracker.name}]", 1, Setting.plugin_redmine_ical['trackers'][tracker.name] == '1' %> </td>
+        </tr>
+      <% end %>
+      </td>
+    </tr>
+  </tbody>
+</table>

@@ -2,3 +2,5 @@
 en:
   field_starting_hours: Starts at (ical)
   field_finishing_hours: Ends at (ical)
+  redmine_ical:
+    trackers: Trackers
