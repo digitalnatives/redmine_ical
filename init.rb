@@ -21,7 +21,7 @@ Rails.configuration.to_prepare do
         begin
           Tod::TimeOfDay.parse(send(hours))
         rescue ArgumentError => _
-          errors.add(hours, "do not follow time format")
+          errors.add(hours, :invalid)
         end
       end
     end
