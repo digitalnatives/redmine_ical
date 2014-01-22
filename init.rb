@@ -14,6 +14,18 @@ Rails.configuration.to_prepare do
 
     after_create :create_event_for_icalendar!, if: :should_generate_ical?
 
+    validate :hours_format
+
+    def hours_format
+      [:starting_hours, :finishing_hours].each do |hours|
+        begin
+          Tod::TimeOfDay.parse(send(hours))
+        rescue ArgumentError => _
+          errors.add(hours, "do not follow time format")
+        end
+      end
+    end
+
     def ical_start_date
       start_day = start_date || Date.today
       start_day.at(starting_hours).to_datetime
