@@ -17,33 +17,24 @@ function syncDateTimeInput(dateInputSelector, $dateTimeInput, datetimepicker){
   datetime_data.setCurrentTime(datetime_data.strtodatetime($dateTimeInput.val()))
 }
 
+function configureDateTimePicker(dateTimeInputSelector, dateInputSelector) {
+  $(dateTimeInputSelector).datetimepicker({
+    format: 'Y-m-d H:i:s',
+    validateOnBlur: false,
+    step: 30,
+    onChangeDateTime: function(dp, $input){
+      syncDateInputs($(dateInputSelector), $input);
+    },
+    onClose: function(dp, $input){
+      removeDateFromDateTimeInput($input);
+    },
+    onShow: function(dp, $input){
+      syncDateTimeInput(dateInputSelector, $input, this)
+    }
+  });
+}
+
 $(function() {
-  $('#issue_starting_hours').datetimepicker({
-    format: 'Y-m-d H:i:s',
-    validateOnBlur: false,
-    step: 30,
-    onChangeDateTime: function(dp, $input){
-      syncDateInputs($('#issue_start_date'), $input);
-    },
-    onClose: function(dp, $input){
-      removeDateFromDateTimeInput($input);
-    },
-    onShow: function(dp, $input){
-      syncDateTimeInput('#issue_start_date', $input, this)
-    }
-  });
-  $('#issue_finishing_hours').datetimepicker({
-    format: 'Y-m-d H:i:s',
-    validateOnBlur: false,
-    step: 30,
-    onChangeDateTime: function(dp, $input){
-      syncDateInputs($('#issue_due_date'), $input);
-    },
-    onClose: function(dp, $input){
-      removeDateFromDateTimeInput($input);
-    },
-    onShow: function(dp, $input){
-      syncDateTimeInput('#issue_due_date', $input, this)
-    }
-  });
+  configureDateTimePicker('#issue_starting_hours', '#issue_start_date');
+  configureDateTimePicker('#issue_finishing_hours', '#issue_due_date');
 });
