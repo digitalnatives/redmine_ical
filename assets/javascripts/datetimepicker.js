@@ -21,6 +21,7 @@ $(function() {
   $('#issue_starting_hours').datetimepicker({
     format: 'Y-m-d H:i:s',
     validateOnBlur: false,
+    step: 30,
     onChangeDateTime: function(dp, $input){
       syncDateInputs($('#issue_start_date'), $input);
     },
@@ -34,6 +35,7 @@ $(function() {
   $('#issue_finishing_hours').datetimepicker({
     format: 'Y-m-d H:i:s',
     validateOnBlur: false,
+    step: 30,
     onChangeDateTime: function(dp, $input){
       syncDateInputs($('#issue_due_date'), $input);
     },
