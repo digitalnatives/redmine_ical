@@ -14,6 +14,18 @@ Rails.configuration.to_prepare do
 
     after_create :create_event_for_icalendar!, if: :should_generate_ical?
 
+    validate :hours_format
+
+    def hours_format
+      [:starting_hours, :finishing_hours].each do |hours|
+        begin
+          Tod::TimeOfDay.parse(send(hours))
+        rescue ArgumentError => _
+          errors.add(hours, :invalid)
+        end
+      end
+    end
+
     def ical_start_date
       start_day = start_date || Date.today
       start_day.at(starting_hours).to_datetime
@@ -48,12 +60,23 @@ Rails.configuration.to_prepare do
   end
 
   Project.class_eval do
+    def self.calendars_folder_name
+      "calendars"
+    end
+
     def cal_filename
-      "calendars/#{identifier}.ics"
+      "#{Project.calendars_folder_name}/#{identifier}.ics"
     end
 
     def save_icalendar!
+      Project.create_calendars_folder_name!
       File.open(cal_filename, 'w+') { |f| f.write icalendar.to_ical }
+    end
+
+    def self.create_calendars_folder_name!
+      unless File.directory?(Project.calendars_folder_name)
+        Dir.mkdir(Project.calendars_folder_name)
+      end
     end
 
     def icalendar
