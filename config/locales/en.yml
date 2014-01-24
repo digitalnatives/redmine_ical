@@ -4,3 +4,4 @@ en:
   field_finishing_hours: Ends at (ical)
   redmine_ical:
     trackers: Trackers
+    general_settings: General settings

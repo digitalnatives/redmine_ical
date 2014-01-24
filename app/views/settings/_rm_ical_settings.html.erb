@@ -1,14 +1,7 @@
-<table>
-  <tbody>
-    <tr>
-      <th><%= l('redmine_ical.trackers') %>:</th>
-      <% Tracker.all.each do |tracker| %>
-        <tr>
-          <th> <%= tracker %> </th>
-          <td> <%= check_box_tag "settings[trackers][#{tracker.name}]", 1, Setting.plugin_redmine_ical['trackers'][tracker.name] == '1' %> </td>
-        </tr>
-      <% end %>
-      </td>
-    </tr>
-  </tbody>
-</table>
+<fieldset>
+  <legend><%= l('redmine_ical.general_settings') %></legend>
+  <p>
+  <h3><%= l('redmine_ical.trackers') %>:</h3>
+  <%= select_tag("settings[trackers]", options_from_collection_for_select(Tracker.all, :id, :name, Setting.plugin_redmine_ical['trackers']), :multiple => true) %>
+  </p>
+</fieldset>
