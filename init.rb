@@ -1,6 +1,14 @@
 Rails.configuration.to_prepare do
   require_dependency 'ical_view_hook_listener'
 
+  JournalDetail.class_eval do
+    private
+    alias_method :old_normalize, :normalize
+    def normalize(v)
+      v.is_a?(Tod::TimeOfDay) ? v.to_s : old_normalize(v)
+    end
+  end
+
   Issue.class_eval do
     safe_attributes 'starting_hours', 'finishing_hours'
 
