@@ -1,0 +1,7 @@
+<fieldset>
+  <legend><%= l('redmine_ical.general_settings') %></legend>
+  <p>
+  <h3><%= l('redmine_ical.trackers') %>:</h3>
+  <%= select_tag("settings[trackers]", options_from_collection_for_select(Tracker.all, :id, :name, Setting.plugin_redmine_ical['trackers']), :multiple => true) %>
+  </p>
+</fieldset>

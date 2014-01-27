@@ -107,4 +107,5 @@ Redmine::Plugin.register :redmine_ical do
   version '0.0.1'
   url 'tba'
   author_url 'tba'
+  settings default: { trackers: nil }, partial: 'settings/rm_ical_settings'
 end
