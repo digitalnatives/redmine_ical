@@ -22,6 +22,7 @@ Rails.configuration.to_prepare do
 
     after_create :create_icalendar_event!, if: :needs_ical_event?
     after_update :update_icalendar_event!, if: :needs_ical_event?
+    after_update :destroy_icalendar_event!, if: :needed_ical_event?
     after_destroy :destroy_icalendar_event!, if: :needs_ical_event?
 
     validate :hours_format, if: :needs_ical_event?
@@ -46,21 +47,36 @@ Rails.configuration.to_prepare do
       finish_day.at(finishing_hours).to_datetime
     end
 
-    def create_icalendar_event!
-      event = up_to_date_event
-      icalendar.add_event(event)
+    def needs_ical_event?
+      Issue.needs_ical_event_for_tracker?(tracker.id)
+    end
 
-      update_column :ical_event_uid, event.uid
-      save_icalendar!
+    def needed_ical_event?
+      !needs_ical_event? && Issue.needs_ical_event_for_tracker?(tracker_id_was)
+    end
+
+    def self.needs_ical_event_for_tracker?(tracker_id)
+      Setting.plugin_redmine_ical['trackers'].include?(tracker_id.to_s)
+    end
+
+    private
+
+    def up_to_date_event
+      event             = ical_event
+      event.start       = ical_start_date
+      event.end         = ical_end_date
+      event.summary     = description
+      event.description = subject
+      event
+    end
+
+    def create_icalendar_event!
+      update_icalendar!(up_to_date_event)
     end
 
     def update_icalendar_event!
       icalendar.remove_event(ical_event)
-      event = up_to_date_event
-      icalendar.add_event(event)
-
-      update_column :ical_event_uid, event.uid
-      save_icalendar!
+      update_icalendar!(up_to_date_event)
     end
 
     def destroy_icalendar_event!
@@ -72,17 +88,11 @@ Rails.configuration.to_prepare do
       icalendar.find_event(ical_event_uid) || Icalendar::Event.new
     end
 
-    def up_to_date_event
-      event             = ical_event
-      event.start       = ical_start_date
-      event.end         = ical_end_date
-      event.summary     = description
-      event.description = subject
-      event
-    end
+    def update_icalendar!(event)
+      icalendar.add_event(event)
 
-    def needs_ical_event?
-      Setting.plugin_redmine_ical['trackers'].include?(tracker.id.to_s)
+      update_column :ical_event_uid, event.uid
+      save_icalendar!
     end
   end
 
