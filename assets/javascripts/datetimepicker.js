@@ -35,6 +35,12 @@ function configureDateTimePicker(dateTimeInputSelector, dateInputSelector) {
 }
 
 $(function() {
-  configureDateTimePicker('#issue_starting_hours', '#issue_start_date');
-  configureDateTimePicker('#issue_finishing_hours', '#issue_due_date');
+  // This is code is using the deprecated event DOMSubtreeModified.
+  // Redmine does not give no other option as it changes the internal HTML
+  // and does not fire up any event to notify a possible listener. For more
+  // details see the Redmine source code file named update_form.js.erb
+  $('#all_attributes').bind("DOMSubtreeModified", function(){
+    configureDateTimePicker('#issue_starting_hours', '#issue_start_date');
+    configureDateTimePicker('#issue_finishing_hours', '#issue_due_date');
+  });
 });
