@@ -16,13 +16,13 @@ Rails.configuration.to_prepare do
     serialize :finishing_hours, Tod::TimeOfDay
 
     validates :starting_hours, :finishing_hours,
-              presence: true, if: :cal_hours_should_be_validated?
+              presence: true, if: :needs_ical_event?
 
     delegate :icalendar, :save_icalendar!, to: :project
 
-    after_create :create_event_for_icalendar!, if: :should_generate_ical?
+    after_create :create_event_for_icalendar!, if: :needs_ical_event?
 
-    validate :hours_format
+    validate :hours_format, if: :needs_ical_event?
 
     def hours_format
       [:starting_hours, :finishing_hours].each do |hours|
@@ -58,12 +58,23 @@ Rails.configuration.to_prepare do
 
     private
 
-    def should_generate_ical?
-      true
     end
 
-    def cal_hours_should_be_validated?
-      true
+    def ical_event
+      icalendar.find_event(ical_event_uid) || Icalendar::Event.new
+    end
+
+    def up_to_date_event
+      event             = ical_event
+      event.start       = ical_start_date
+      event.end         = ical_end_date
+      event.summary     = description
+      event.description = subject
+      event
+    end
+
+    def needs_ical_event?
+      Setting.plugin_redmine_ical['trackers'].include?(tracker.id.to_s)
     end
   end
 
@@ -88,7 +99,6 @@ Rails.configuration.to_prepare do
     end
 
     def icalendar
-
       @ical ||= begin
                   Icalendar.parse(File.open(cal_filename)).first || Icalendar::Calendar.new
                 rescue
