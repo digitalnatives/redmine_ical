@@ -21,6 +21,7 @@ Rails.configuration.to_prepare do
     delegate :icalendar, :save_icalendar!, to: :project
 
     after_create :create_event_for_icalendar!, if: :needs_ical_event?
+    after_update :update_event_for_icalendar!, if: :needs_ical_event?
 
     validate :hours_format, if: :needs_ical_event?
 
@@ -45,19 +46,20 @@ Rails.configuration.to_prepare do
     end
 
     def create_event_for_icalendar!
-      event = Icalendar::Event.new
-      event.start       = ical_start_date
-      event.end         = ical_end_date
-      event.summary     = description
-      event.description = subject
+      event = up_to_date_event
       icalendar.add_event(event)
 
       update_column :ical_event_uid, event.uid
       save_icalendar!
     end
 
-    private
+    def update_event_for_icalendar!
+      icalendar.remove_event(ical_event)
+      event = up_to_date_event
+      icalendar.add_event(event)
 
+      update_column :ical_event_uid, event.uid
+      save_icalendar!
     end
 
     def ical_event
