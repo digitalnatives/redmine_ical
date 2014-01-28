@@ -20,8 +20,9 @@ Rails.configuration.to_prepare do
 
     delegate :icalendar, :save_icalendar!, to: :project
 
-    after_create :create_event_for_icalendar!, if: :needs_ical_event?
-    after_update :update_event_for_icalendar!, if: :needs_ical_event?
+    after_create :create_icalendar_event!, if: :needs_ical_event?
+    after_update :update_icalendar_event!, if: :needs_ical_event?
+    after_destroy :destroy_icalendar_event!, if: :needs_ical_event?
 
     validate :hours_format, if: :needs_ical_event?
 
@@ -45,7 +46,7 @@ Rails.configuration.to_prepare do
       finish_day.at(finishing_hours).to_datetime
     end
 
-    def create_event_for_icalendar!
+    def create_icalendar_event!
       event = up_to_date_event
       icalendar.add_event(event)
 
@@ -53,12 +54,17 @@ Rails.configuration.to_prepare do
       save_icalendar!
     end
 
-    def update_event_for_icalendar!
+    def update_icalendar_event!
       icalendar.remove_event(ical_event)
       event = up_to_date_event
       icalendar.add_event(event)
 
       update_column :ical_event_uid, event.uid
+      save_icalendar!
+    end
+
+    def destroy_icalendar_event!
+      icalendar.remove_event(ical_event)
       save_icalendar!
     end
 
