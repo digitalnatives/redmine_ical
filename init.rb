@@ -105,6 +105,10 @@ Rails.configuration.to_prepare do
       "#{Project.calendars_folder_name}/#{identifier}.ics"
     end
 
+    def has_ical_file?
+      File.file?(cal_filename)
+    end
+
     def save_icalendar!
       Project.create_calendars_folder_name!
       File.open(cal_filename, 'w+') { |f| f.write icalendar.to_ical }

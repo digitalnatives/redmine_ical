@@ -1,6 +1,6 @@
 <div class="box">
   <h3>iCal</h3>
-  <% if File.file?(project.cal_filename) %>
+  <% if project.has_ical_file? %>
     <%= link_to t('redmine_ical.download'), project_ical_path(project) %>
   <% else %>
     <p><%= t('redmine_ical.not_found') %></p>
