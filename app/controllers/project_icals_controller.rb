@@ -9,8 +9,8 @@ class ProjectIcalsController < ApplicationController
   end
 
   def check_token
-    valid_token = @project.valid_ical_tokens.where(token: params[:token])
-    render_403 unless valid_token.present?
+    token = @project.ical_download_tokens.where(token: params[:token])
+    render_403 unless token.present?
   end
 
   def show

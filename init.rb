@@ -117,7 +117,7 @@ Rails.configuration.to_prepare do
 
     def ical_download_token!
       save_icalendar!
-      valid_ical_tokens.first_or_create.token
+      ical_download_tokens.first_or_create.token
     end
 
     def save_icalendar!
