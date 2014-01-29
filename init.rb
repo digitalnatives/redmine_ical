@@ -97,6 +97,8 @@ Rails.configuration.to_prepare do
   end
 
   Project.class_eval do
+    has_many :ical_download_tokens
+
     def self.calendars_folder_name
       "calendars"
     end
@@ -107,6 +109,15 @@ Rails.configuration.to_prepare do
 
     def has_ical_file?
       File.file?(cal_filename)
+    end
+
+    def valid_ical_tokens
+      ical_download_tokens.valid
+    end
+
+    def ical_download_token!
+      save_icalendar!
+      valid_ical_tokens.first_or_create.token
     end
 
     def save_icalendar!

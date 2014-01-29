@@ -9,8 +9,8 @@ class ProjectIcalsController < ApplicationController
   end
 
   def check_token
-    token = IcalDownloadToken.where(project_id: @project.id, token: params[:token]).first
-    render_403 if token.expired?
+    valid_token = @project.valid_ical_tokens.where(token: params[:token])
+    render_403 unless valid_token.present?
   end
 
   def show
