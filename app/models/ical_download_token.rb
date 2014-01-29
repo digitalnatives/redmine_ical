@@ -6,6 +6,8 @@ class IcalDownloadToken < ActiveRecord::Base
 
   validates :project_id, presence: true
 
+  scope :valid, -> { where("expires_at >= ?", Time.now) }
+
   def expired?
     expires_at < Time.now
   end
