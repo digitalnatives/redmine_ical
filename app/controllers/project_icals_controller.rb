@@ -1,6 +1,7 @@
 class ProjectIcalsController < ApplicationController
   unloadable
 
+  skip_before_filter :check_if_login_required
   before_filter :find_project
   before_filter :check_token
 
