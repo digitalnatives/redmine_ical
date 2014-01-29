@@ -27,6 +27,10 @@ Rails.configuration.to_prepare do
 
     validate :hours_format, if: :needs_ical_event?
 
+    scope :ical_events, -> do
+      where("tracker_id IN (?)", Setting.plugin_redmine_ical['trackers'])
+    end
+
     def hours_format
       [:starting_hours, :finishing_hours].each do |hours|
         begin
@@ -59,16 +63,25 @@ Rails.configuration.to_prepare do
       Setting.plugin_redmine_ical['trackers'].include?(tracker_id.to_s)
     end
 
-    private
+    def ical_event
+      icalendar.find_event(ical_event_uid)
+    end
 
     def up_to_date_event
-      event             = ical_event
+      event             = Icalendar::Event.new
       event.start       = ical_start_date
       event.end         = ical_end_date
       event.summary     = description
       event.description = subject
       event
     end
+
+    def up_to_date_event!
+      event = up_to_date_event
+      (update_column :ical_event_uid, event.uid) && event
+    end
+
+    private
 
     def create_icalendar_event!
       update_icalendar!(up_to_date_event)
@@ -82,10 +95,6 @@ Rails.configuration.to_prepare do
     def destroy_icalendar_event!
       icalendar.remove_event(ical_event)
       save_icalendar!
-    end
-
-    def ical_event
-      icalendar.find_event(ical_event_uid) || Icalendar::Event.new
     end
 
     def update_icalendar!(event)
@@ -116,7 +125,7 @@ Rails.configuration.to_prepare do
     end
 
     def ical_download_token!
-      save_icalendar!
+      save_icalendar! unless has_ical_file?
       ical_download_tokens.first_or_create.token
     end
 
@@ -133,11 +142,19 @@ Rails.configuration.to_prepare do
 
     def icalendar
       @ical ||= begin
-                  Icalendar.parse(File.open(cal_filename)).first || Icalendar::Calendar.new
+                  Icalendar.parse(File.open(cal_filename)).first || raise
                 rescue
-                  Icalendar::Calendar.new
+                  new_calendar
                 end
       @ical
+    end
+
+    def new_calendar
+      calendar = Icalendar::Calendar.new
+      issues.ical_events.each do |issue|
+        calendar.add_event(issue.up_to_date_event!)
+      end
+      calendar
     end
   end
 
