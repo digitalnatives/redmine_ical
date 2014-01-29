@@ -9,5 +9,7 @@ class CreateIcalDownloadTokensTable < ActiveRecord::Migration
     end
 
     add_index :ical_download_tokens, [:token, :project_id], unique: true
+    add_index :ical_download_tokens, :project_id
+    add_index :ical_download_tokens, :expires_at
   end
 end
