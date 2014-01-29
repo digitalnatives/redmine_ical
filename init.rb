@@ -16,13 +16,20 @@ Rails.configuration.to_prepare do
     serialize :finishing_hours, Tod::TimeOfDay
 
     validates :starting_hours, :finishing_hours,
-              presence: true, if: :cal_hours_should_be_validated?
+              presence: true, if: :needs_ical_event?
 
     delegate :icalendar, :save_icalendar!, to: :project
 
-    after_create :create_event_for_icalendar!, if: :should_generate_ical?
+    after_create :create_icalendar_event!, if: :needs_ical_event?
+    after_update :update_icalendar_event!, if: :needs_ical_event?
+    after_update :destroy_icalendar_event!, if: :needed_ical_event?
+    after_destroy :destroy_icalendar_event!, if: :needs_ical_event?
 
-    validate :hours_format
+    validate :hours_format, if: :needs_ical_event?
+
+    scope :ical_events, -> do
+      where("tracker_id IN (?)", Setting.plugin_redmine_ical['trackers'])
+    end
 
     def hours_format
       [:starting_hours, :finishing_hours].each do |hours|
@@ -44,36 +51,82 @@ Rails.configuration.to_prepare do
       finish_day.at(finishing_hours).to_datetime
     end
 
-    def create_event_for_icalendar!
-      event = Icalendar::Event.new
+    def needs_ical_event?
+      Issue.needs_ical_event_for_tracker?(tracker.id)
+    end
+
+    def needed_ical_event?
+      !needs_ical_event? && Issue.needs_ical_event_for_tracker?(tracker_id_was)
+    end
+
+    def self.needs_ical_event_for_tracker?(tracker_id)
+      Setting.plugin_redmine_ical['trackers'].include?(tracker_id.to_s)
+    end
+
+    def ical_event
+      icalendar.find_event(ical_event_uid)
+    end
+
+    def up_to_date_event
+      event             = Icalendar::Event.new
       event.start       = ical_start_date
       event.end         = ical_end_date
       event.summary     = description
       event.description = subject
+      event
+    end
+
+    def up_to_date_event!
+      event = up_to_date_event
+      (update_column :ical_event_uid, event.uid) && event
+    end
+
+    private
+
+    def create_icalendar_event!
+      update_icalendar!(up_to_date_event)
+    end
+
+    def update_icalendar_event!
+      icalendar.remove_event(ical_event)
+      update_icalendar!(up_to_date_event)
+    end
+
+    def destroy_icalendar_event!
+      icalendar.remove_event(ical_event)
+      save_icalendar!
+    end
+
+    def update_icalendar!(event)
       icalendar.add_event(event)
 
       update_column :ical_event_uid, event.uid
       save_icalendar!
     end
-
-    private
-
-    def should_generate_ical?
-      true
-    end
-
-    def cal_hours_should_be_validated?
-      true
-    end
   end
 
   Project.class_eval do
+    has_many :ical_download_tokens
+
     def self.calendars_folder_name
       "calendars"
     end
 
     def cal_filename
       "#{Project.calendars_folder_name}/#{identifier}.ics"
+    end
+
+    def has_ical_file?
+      File.file?(cal_filename)
+    end
+
+    def valid_ical_tokens
+      ical_download_tokens.valid
+    end
+
+    def ical_download_token!
+      save_icalendar! unless has_ical_file?
+      ical_download_tokens.first_or_create.token
     end
 
     def save_icalendar!
@@ -88,13 +141,20 @@ Rails.configuration.to_prepare do
     end
 
     def icalendar
-
       @ical ||= begin
-                  Icalendar.parse(File.open(cal_filename)).first || Icalendar::Calendar.new
+                  Icalendar.parse(File.open(cal_filename)).first || raise
                 rescue
-                  Icalendar::Calendar.new
+                  new_calendar
                 end
       @ical
+    end
+
+    def new_calendar
+      calendar = Icalendar::Calendar.new
+      issues.ical_events.each do |issue|
+        calendar.add_event(issue.up_to_date_event!)
+      end
+      calendar
     end
   end
 

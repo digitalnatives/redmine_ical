@@ -1,0 +1,5 @@
+<div class="box">
+  <h3>iCal</h3>
+  <p> <%= project_ical_url(project, token: project.ical_download_token!) %> </p>
+  <p> <%= link_to t('redmine_ical.download'), project_ical_path(project, token: project.ical_download_token!) %> </p>
+</div>

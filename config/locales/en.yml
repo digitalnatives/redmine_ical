@@ -2,6 +2,8 @@
 en:
   field_starting_hours: Starts at (ical)
   field_finishing_hours: Ends at (ical)
+  field_event_uid: Event uid
   redmine_ical:
     trackers: Trackers
     general_settings: General settings
+    download: Download ical file

@@ -1,4 +1,4 @@
-<% if Setting.plugin_redmine_ical['trackers'].include? issue.tracker.id.to_s %>
+<% if issue.needs_ical_event? %>
   <p><%= form.text_field :starting_hours %></p>
   <p><%= form.text_field :finishing_hours %></p>
 <% end %>
