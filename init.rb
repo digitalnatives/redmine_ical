@@ -71,8 +71,8 @@ Rails.configuration.to_prepare do
       event             = Icalendar::Event.new
       event.start       = ical_start_date
       event.end         = ical_end_date
-      event.summary     = description
-      event.description = subject
+      event.summary     = subject
+      event.description = description
       event
     end
 
