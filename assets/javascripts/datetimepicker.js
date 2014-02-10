@@ -11,7 +11,7 @@ function removeDateFromDateTimeInput(dateTimeInput) {
 }
 
 function syncDateTimeInput(dateInputSelector, $dateTimeInput, datetimepicker){
-  $dateTimeInput.val($(dateInputSelector).val() + ' ' + $dateTimeInput.val().split(' ').pop());
+  $dateTimeInput.val($(dateInputSelector).val() + ' ' + $dateTimeInput.val().split(' ').pop().replace(/(..:..).*/, "$1:00"));
 
   var datetime_data = datetimepicker.data().xdsoft_datetime;
   datetime_data.setCurrentTime(datetime_data.strtodatetime($dateTimeInput.val()))
