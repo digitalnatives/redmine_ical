@@ -18,6 +18,14 @@ function syncDateTimeInput(dateInputSelector, $dateTimeInput, datetimepicker){
 }
 
 function configureDateTimePicker(dateTimeInputSelector, dateInputSelector) {
+  var dateValue = $(dateInputSelector).val();
+  if ((!dateValue || 0 === dateValue.length)) {
+    var d = new Date();
+    var year = d.getFullYear();
+    var month = ("0" + (d.getMonth() + 1)).slice(-2);
+    var day = d.getDate();
+    $(dateInputSelector).val(year + "-" + month + "-" + day);
+  }
   $(dateTimeInputSelector).datetimepicker({
     format: 'Y-m-d H:i:s',
     validateOnBlur: false,
