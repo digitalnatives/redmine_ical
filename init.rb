@@ -1,6 +1,8 @@
 Rails.configuration.to_prepare do
   require_dependency 'ical_view_hook_listener'
 
+  Issue.add_hidden_attribute "ical_event_uid"
+
   JournalDetail.class_eval do
     private
     alias_method :old_normalize, :normalize
