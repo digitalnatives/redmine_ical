@@ -23,7 +23,7 @@ function configureDateTimePicker(dateTimeInputSelector, dateInputSelector) {
     var d = new Date();
     var year = d.getFullYear();
     var month = ("0" + (d.getMonth() + 1)).slice(-2);
-    var day = d.getDate();
+    var day = ("0" + d.getDate()).slice(-2);
     $(dateInputSelector).val(year + "-" + month + "-" + day);
   }
   $(dateTimeInputSelector).datetimepicker({
