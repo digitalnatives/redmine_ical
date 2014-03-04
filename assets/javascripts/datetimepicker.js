@@ -47,8 +47,16 @@ $(function() {
   // Redmine does not give no other option as it changes the internal HTML
   // and does not fire up any event to notify a possible listener. For more
   // details see the Redmine source code file named update_form.js.erb
+  var dueDateInitialValue = $('#issue_due_date').val();
   $('#all_attributes').bind("DOMSubtreeModified", function(){
-    configureDateTimePicker('#issue_starting_hours', '#issue_start_date');
-    configureDateTimePicker('#issue_finishing_hours', '#issue_due_date');
+    if ($('#issue_starting_hours').length) {
+      configureDateTimePicker('#issue_starting_hours', '#issue_start_date');
+    }
+    if ($('#issue_finishing_hours').length) {
+      configureDateTimePicker('#issue_finishing_hours', '#issue_due_date');
+    }
+    else {
+      $('#issue_due_date').val(dueDateInitialValue);
+    }
   });
 });
