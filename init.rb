@@ -109,9 +109,10 @@ Rails.configuration.to_prepare do
 
   Project.class_eval do
     has_many :ical_download_tokens
+    CALENDAR_FILES_PATH = 'storage/calendars'
 
     def self.calendars_folder_name
-      "calendars"
+      CALENDAR_FILES_PATH
     end
 
     def cal_filename
