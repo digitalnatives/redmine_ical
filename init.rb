@@ -111,7 +111,7 @@ Rails.configuration.to_prepare do
     has_many :ical_download_tokens
 
     def self.calendars_folder_name
-      "calendars"
+      Redmine::Configuration['calendars_path'] || 'calendars'
     end
 
     def cal_filename
