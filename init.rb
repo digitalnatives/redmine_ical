@@ -109,10 +109,9 @@ Rails.configuration.to_prepare do
 
   Project.class_eval do
     has_many :ical_download_tokens
-    CALENDAR_FILES_PATH = 'storage/calendars'
 
     def self.calendars_folder_name
-      CALENDAR_FILES_PATH
+      Redmine::Configuration['calendars_path'] || 'calendars'
     end
 
     def cal_filename
