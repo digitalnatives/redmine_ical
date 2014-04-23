@@ -36,7 +36,7 @@ Rails.configuration.to_prepare do
     def hours_format
       [:starting_hours, :finishing_hours].each do |hours|
         begin
-          Tod::TimeOfDay.parse(send(hours))
+          Tod::TimeOfDay.parse(send(hours).to_s)
         rescue ArgumentError => _
           errors.add(hours, :invalid)
         end
