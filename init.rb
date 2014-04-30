@@ -90,7 +90,7 @@ Rails.configuration.to_prepare do
     end
 
     def update_icalendar_event!
-      icalendar.remove_event(ical_event)
+      icalendar.remove_event(ical_event) if ical_event
       update_icalendar!(up_to_date_event)
     end
 
