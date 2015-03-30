@@ -1,3 +1,7 @@
+= Deprecation notice
+
+This repository is not maintained.
+
 = Redmine ICAL plugin
 
 This is a plugin for redmine that generates ical for the specified trackers.
